@@ -94,6 +94,27 @@ const updateConnectivityStatus = (partnerId, connectivityRequest) => {
 
   return partner;
 };
+const updateTestingStatus = (partnerId, testingRequest) => {
+  const partner = getPartnerById(partnerId);
+
+  if (!partner) {
+    return null;
+  }
+
+  partner.testing = {
+    status: testingRequest.status,
+    totalTestCases: testingRequest.totalTestCases || 0,
+    passed: testingRequest.passed || 0,
+    failed: testingRequest.failed || 0,
+    blocked: testingRequest.blocked || 0,
+    notes: testingRequest.notes || "",
+    updatedAt: new Date().toISOString()
+  };
+
+  partner.updatedAt = new Date().toISOString();
+
+  return partner;
+};
 
 module.exports = {
   createPartner,
@@ -101,5 +122,6 @@ module.exports = {
   getPartnerById,
   updatePartnerStatus,
   getPartnersByStatus,
-  updateConnectivityStatus
+  updateConnectivityStatus,
+  updateTestingStatus
 };
