@@ -101,6 +101,17 @@ const updateTestingStatus = (partnerId, testingRequest) => {
     return null;
   }
 
+  if (
+    testingRequest.status === "IN_PROGRESS" &&
+    (!partner.connectivity || partner.connectivity.status !== "COMPLETED")
+  ) {
+    return {
+      error: true,
+      statusCode: 400,
+      message: "Connectivity must be completed before testing can start"
+    };
+  }
+
   partner.testing = {
     status: testingRequest.status,
     totalTestCases: testingRequest.totalTestCases || 0,
@@ -115,11 +126,23 @@ const updateTestingStatus = (partnerId, testingRequest) => {
 
   return partner;
 };
+
 const updateCertificationStatus = (partnerId, certificationRequest) => {
   const partner = getPartnerById(partnerId);
 
   if (!partner) {
     return null;
+  }
+
+  if (
+    certificationRequest.status === "CERTIFIED" &&
+    (!partner.testing || partner.testing.status !== "PASSED")
+  ) {
+    return {
+      error: true,
+      statusCode: 400,
+      message: "Testing must be passed before certification can be completed"
+    };
   }
 
   partner.certification = {
@@ -141,6 +164,17 @@ const updateGoLiveStatus = (partnerId, goLiveRequest) => {
 
   if (!partner) {
     return null;
+  }
+
+  if (
+    goLiveRequest.status === "READY" &&
+    (!partner.certification || partner.certification.status !== "CERTIFIED")
+  ) {
+    return {
+      error: true,
+      statusCode: 400,
+      message: "Certification must be completed before go-live readiness"
+    };
   }
 
   partner.goLive = {

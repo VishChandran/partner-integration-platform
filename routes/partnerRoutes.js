@@ -68,6 +68,12 @@ router.patch("/:partnerId/testing", (req, res) => {
     });
   }
 
+  if (partner.error) {
+    return res.status(partner.statusCode).json({
+      message: partner.message
+    });
+  }
+
   res.status(200).json(partner);
 });
 router.patch("/:partnerId/certification", (req, res) => {
@@ -79,6 +85,12 @@ router.patch("/:partnerId/certification", (req, res) => {
   if (!partner) {
     return res.status(404).json({
       message: "Partner not found"
+    });
+  }
+
+  if (partner.error) {
+    return res.status(partner.statusCode).json({
+      message: partner.message
     });
   }
 
@@ -94,6 +106,12 @@ router.patch("/:partnerId/go-live", (req, res) => {
   if (!partner) {
     return res.status(404).json({
       message: "Partner not found"
+    });
+  }
+
+  if (partner.error) {
+    return res.status(partner.statusCode).json({
+      message: partner.message
     });
   }
 
