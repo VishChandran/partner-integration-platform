@@ -136,6 +136,29 @@ const updateCertificationStatus = (partnerId, certificationRequest) => {
   return partner;
 };
 
+const updateGoLiveStatus = (partnerId, goLiveRequest) => {
+  const partner = getPartnerById(partnerId);
+
+  if (!partner) {
+    return null;
+  }
+
+  partner.goLive = {
+    status: goLiveRequest.status,
+    productionDate: goLiveRequest.productionDate || null,
+    businessApproval: goLiveRequest.businessApproval || false,
+    technologyApproval: goLiveRequest.technologyApproval || false,
+    operationsApproval: goLiveRequest.operationsApproval || false,
+    rollbackPlanReady: goLiveRequest.rollbackPlanReady || false,
+    notes: goLiveRequest.notes || "",
+    updatedAt: new Date().toISOString()
+  };
+
+  partner.updatedAt = new Date().toISOString();
+
+  return partner;
+};
+
 module.exports = {
   createPartner,
   getPartners,
@@ -144,5 +167,6 @@ module.exports = {
   getPartnersByStatus,
   updateConnectivityStatus,
   updateTestingStatus,
-  updateCertificationStatus
+  updateCertificationStatus,
+  updateGoLiveStatus
 };

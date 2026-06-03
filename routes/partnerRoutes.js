@@ -84,6 +84,22 @@ router.patch("/:partnerId/certification", (req, res) => {
 
   res.status(200).json(partner);
 });
+
+router.patch("/:partnerId/go-live", (req, res) => {
+  const partner = partnerService.updateGoLiveStatus(
+    req.params.partnerId,
+    req.body
+  );
+
+  if (!partner) {
+    return res.status(404).json({
+      message: "Partner not found"
+    });
+  }
+
+  res.status(200).json(partner);
+});
+
 router.get("/:partnerId", (req, res) => {
   const partner = partnerService.getPartnerById(req.params.partnerId);
 
