@@ -5,8 +5,11 @@ const helmet = require("helmet");
 const config = require("./config/config");
 const logger = require("./logger/logger");
 const partnerRoutes = require("./routes/partnerRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
+
 
 const app = express();
+app.use("/dashboard", dashboardRoutes);
 
 /*
 |--------------------------------------------------------------------------

@@ -159,6 +159,36 @@ const updateGoLiveStatus = (partnerId, goLiveRequest) => {
   return partner;
 };
 
+const getDashboardSummary = () => {
+
+  return {
+
+    totalPartners: partners.length,
+
+    requested: partners.filter(
+      partner => partner.status === "REQUESTED"
+    ).length,
+
+    approved: partners.filter(
+      partner => partner.status === "APPROVED"
+    ).length,
+
+    certified: partners.filter(
+      partner =>
+        partner.certification &&
+        partner.certification.status === "CERTIFIED"
+    ).length,
+
+    productionReady: partners.filter(
+      partner =>
+        partner.goLive &&
+        partner.goLive.status === "READY"
+    ).length
+
+  };
+
+};
+
 module.exports = {
   createPartner,
   getPartners,
@@ -168,5 +198,6 @@ module.exports = {
   updateConnectivityStatus,
   updateTestingStatus,
   updateCertificationStatus,
-  updateGoLiveStatus
+  updateGoLiveStatus,
+  getDashboardSummary
 };
