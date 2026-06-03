@@ -73,10 +73,33 @@ const getPartnersByStatus = (status) => {
 
 };
 
+const updateConnectivityStatus = (partnerId, connectivityRequest) => {
+  const partner = getPartnerById(partnerId);
+
+  if (!partner) {
+    return null;
+  }
+
+  partner.connectivity = {
+    status: connectivityRequest.status,
+    sandboxAccess: connectivityRequest.sandboxAccess || false,
+    ipWhitelisted: connectivityRequest.ipWhitelisted || false,
+    certificateExchanged: connectivityRequest.certificateExchanged || false,
+    apiGatewayAccess: connectivityRequest.apiGatewayAccess || false,
+    notes: connectivityRequest.notes || "",
+    updatedAt: new Date().toISOString()
+  };
+
+  partner.updatedAt = new Date().toISOString();
+
+  return partner;
+};
+
 module.exports = {
   createPartner,
   getPartners,
   getPartnerById,
   updatePartnerStatus,
-  getPartnersByStatus
+  getPartnersByStatus,
+  updateConnectivityStatus
 };
