@@ -115,6 +115,26 @@ const updateTestingStatus = (partnerId, testingRequest) => {
 
   return partner;
 };
+const updateCertificationStatus = (partnerId, certificationRequest) => {
+  const partner = getPartnerById(partnerId);
+
+  if (!partner) {
+    return null;
+  }
+
+  partner.certification = {
+    status: certificationRequest.status,
+    certifiedProducts: certificationRequest.certifiedProducts || [],
+    certificationDate: certificationRequest.certificationDate || null,
+    approver: certificationRequest.approver || "",
+    notes: certificationRequest.notes || "",
+    updatedAt: new Date().toISOString()
+  };
+
+  partner.updatedAt = new Date().toISOString();
+
+  return partner;
+};
 
 module.exports = {
   createPartner,
@@ -123,5 +143,6 @@ module.exports = {
   updatePartnerStatus,
   getPartnersByStatus,
   updateConnectivityStatus,
-  updateTestingStatus
+  updateTestingStatus,
+  updateCertificationStatus
 };
