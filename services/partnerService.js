@@ -148,7 +148,13 @@ const updateCertificationStatus = (partnerId, certificationRequest) => {
   partner.certification = {
     status: certificationRequest.status,
     certifiedProducts: certificationRequest.certifiedProducts || [],
-    certificationDate: certificationRequest.certificationDate || null,
+    certificationDate:
+  certificationRequest.certificationDate ||
+  (
+    certificationRequest.status === "CERTIFIED"
+      ? new Date().toISOString()
+      : null
+  ),
     approver: certificationRequest.approver || "",
     notes: certificationRequest.notes || "",
     updatedAt: new Date().toISOString()
@@ -179,7 +185,13 @@ const updateGoLiveStatus = (partnerId, goLiveRequest) => {
 
   partner.goLive = {
     status: goLiveRequest.status,
-    productionDate: goLiveRequest.productionDate || null,
+    productionDate:
+  goLiveRequest.productionDate ||
+  (
+    goLiveRequest.status === "READY"
+      ? new Date().toISOString()
+      : null
+  ),
     businessApproval: goLiveRequest.businessApproval || false,
     technologyApproval: goLiveRequest.technologyApproval || false,
     operationsApproval: goLiveRequest.operationsApproval || false,
