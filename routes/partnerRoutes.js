@@ -78,8 +78,8 @@ router.patch("/:partnerId/testing", (req, res) => {
   res.status(200).json(partner);
 });
 
-router.patch("/:partnerId/certification", (req, res) => {
-  const partner = partnerService.updateCertificationStatus(
+router.patch("/:partnerId/certification", async (req, res) => {
+  const partner = await partnerService.updateCertificationStatus(
     req.params.partnerId,
     req.body
   );
@@ -99,8 +99,8 @@ router.patch("/:partnerId/certification", (req, res) => {
   res.status(200).json(partner);
 });
 
-router.patch("/:partnerId/go-live", (req, res) => {
-  const partner = partnerService.updateGoLiveStatus(
+router.patch("/:partnerId/go-live", async (req, res) => {
+  const partner = await partnerService.updateGoLiveStatus(
     req.params.partnerId,
     req.body
   );

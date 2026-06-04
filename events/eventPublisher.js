@@ -1,7 +1,8 @@
 const events = require("../store/eventStore");
 const notificationService = require("../services/notificationService");
+const kafkaProducer = require("../kafka/kafkaProducer");
 
-const publishEvent = (eventType, payload) => {
+const publishEvent = async (eventType, payload) => {
   const event = {
     eventId: `EVT-${Date.now()}`,
     eventType,
@@ -10,6 +11,17 @@ const publishEvent = (eventType, payload) => {
   };
 
   events.push(event);
+  try {
+  await kafkaProducer.publishKafkaEvent(
+    "partner-lifecycle-events",
+    event
+  );
+} catch (error) {
+  console.error(
+    "Failed to publish event to Kafka",
+    error.message
+  );
+}
   if (eventType === "PARTNER_CERTIFIED") {
   notificationService.createNotification(
     "EMAIL",

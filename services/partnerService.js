@@ -172,8 +172,8 @@ const updateTestingStatus = (partnerId, testingRequest) => {
   return partner;
 };
 
-const updateCertificationStatus = (partnerId, certificationRequest) => {
-  const partner = getPartnerById(partnerId);
+const updateCertificationStatus = async (partnerId, certificationRequest) => {
+  const partner = await getPartnerById(partnerId);
 
   if (!partner) {
     return null;
@@ -213,11 +213,11 @@ const updateCertificationStatus = (partnerId, certificationRequest) => {
   certificationRequest
 );
 if (partner.certification.status === "CERTIFIED") {
-  eventPublisher.publishEvent(
+  await eventPublisher.publishEvent(
     "PARTNER_CERTIFIED",
     {
-      partnerId: partner.partnerId,
-      partnerName: partner.partnerName,
+      partnerId: partner.partner_id,
+      partnerName: partner.partner_name,
       certifiedProducts: partner.certification.certifiedProducts,
       certificationDate: partner.certification.certificationDate
     }
@@ -226,8 +226,8 @@ if (partner.certification.status === "CERTIFIED") {
   return partner;
 };
 
-const updateGoLiveStatus = (partnerId, goLiveRequest) => {
-  const partner = getPartnerById(partnerId);
+const updateGoLiveStatus = async (partnerId, goLiveRequest) => {
+  const partner = await getPartnerById(partnerId);
 
   if (!partner) {
     return null;
@@ -269,11 +269,11 @@ const updateGoLiveStatus = (partnerId, goLiveRequest) => {
   goLiveRequest
 );
 if (partner.goLive.status === "READY") {
-  eventPublisher.publishEvent(
+  await eventPublisher.publishEvent(
     "PARTNER_READY_FOR_GO_LIVE",
     {
-      partnerId: partner.partnerId,
-      partnerName: partner.partnerName,
+      partnerId: partner.partner_id,
+      partnerName: partner.partner_name,
       productionDate: partner.goLive.productionDate
     }
   );

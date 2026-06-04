@@ -11,5 +11,14 @@ module.exports = {
   name: process.env.DB_NAME || "partner_integration",
   user: process.env.DB_USER || "postgres",
   password: process.env.DB_PASSWORD || ""
+},
+kafka: {
+  clientId:
+    process.env.KAFKA_CLIENT_ID ||
+    "partner-integration-platform",
+
+  broker:
+    process.env.KAFKA_BROKER ||
+    "localhost:9092"
 }
 };
