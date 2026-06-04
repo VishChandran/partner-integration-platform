@@ -117,6 +117,16 @@ router.patch("/:partnerId/go-live", (req, res) => {
 
   res.status(200).json(partner);
 });
+router.get("/:partnerId/history", (req, res) => {
+
+  const history =
+    partnerService.getAuditHistory(
+      req.params.partnerId
+    );
+
+  res.status(200).json(history);
+
+});
 
 router.get("/:partnerId", (req, res) => {
   const partner = partnerService.getPartnerById(req.params.partnerId);

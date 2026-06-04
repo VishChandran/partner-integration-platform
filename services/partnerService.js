@@ -1,4 +1,5 @@
 const partners = require("../store/partnerStore");
+const auditHistory = require("../store/auditStore");
 
 const createPartner = (partnerRequest) => {
   const existingPartner = getPartnerById(partnerRequest.partnerId);
@@ -91,7 +92,11 @@ const updateConnectivityStatus = (partnerId, connectivityRequest) => {
   };
 
   partner.updatedAt = new Date().toISOString();
-
+  addAuditRecord(
+  partnerId,
+  "CONNECTIVITY_UPDATED",
+  connectivityRequest
+);
   return partner;
 };
 const updateTestingStatus = (partnerId, testingRequest) => {
@@ -123,7 +128,12 @@ const updateTestingStatus = (partnerId, testingRequest) => {
   };
 
   partner.updatedAt = new Date().toISOString();
-
+  
+  addAuditRecord(
+  partnerId,
+  "TESTING_UPDATED",
+  testingRequest
+);
   return partner;
 };
 
@@ -161,6 +171,12 @@ const updateCertificationStatus = (partnerId, certificationRequest) => {
   };
 
   partner.updatedAt = new Date().toISOString();
+  
+  addAuditRecord(
+  partnerId,
+  "CERTIFICATION_UPDATED",
+  certificationRequest
+);
 
   return partner;
 };
@@ -202,6 +218,12 @@ const updateGoLiveStatus = (partnerId, goLiveRequest) => {
 
   partner.updatedAt = new Date().toISOString();
 
+  addAuditRecord(
+  partnerId,
+  "GO_LIVE_UPDATED",
+  goLiveRequest
+);
+
   return partner;
 };
 
@@ -230,8 +252,36 @@ const getDashboardSummary = () => {
         partner.goLive &&
         partner.goLive.status === "READY"
     ).length
-
+    };
   };
+
+  const addAuditRecord = (
+  partnerId,
+  action,
+  details
+) => {
+
+  auditHistory.push({
+
+    partnerId,
+
+    action,
+
+    details,
+
+    timestamp: new Date().toISOString()
+
+  });
+
+};
+const getAuditHistory = (
+  partnerId
+) => {
+
+  return auditHistory.filter(
+    record =>
+      record.partnerId === partnerId
+  );
 
 };
 
@@ -245,5 +295,6 @@ module.exports = {
   updateTestingStatus,
   updateCertificationStatus,
   updateGoLiveStatus,
-  getDashboardSummary
+  getDashboardSummary,
+  getAuditHistory
 };
