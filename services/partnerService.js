@@ -4,6 +4,8 @@ const eventPublisher = require("../events/eventPublisher");
 const pool = require("../db/db");
 const connectivityRepository = require("../repositories/connectivityRepository");
 const testingRepository = require("../repositories/testingRepository");
+const certificationRepository = require("../repositories/certificationRepository");
+const goLiveRepository = require("../repositories/goLiveRepository");
 
 const createPartner = async (partnerRequest) => {
 
@@ -175,115 +177,81 @@ const updateTestingStatus = async (
   };
 };
 
-const updateCertificationStatus = async (partnerId, certificationRequest) => {
-  const partner = await getPartnerById(partnerId);
+const updateCertificationStatus = async (
+  partnerId,
+  certificationRequest
+) => {
+
+  const partner =
+    await getPartnerById(partnerId);
 
   if (!partner) {
     return null;
   }
 
-  if (
-    certificationRequest.status === "CERTIFIED" &&
-    (!partner.testing || partner.testing.status !== "PASSED")
-  ) {
-    return {
-      error: true,
-      statusCode: 400,
-      message: "Testing must be passed before certification can be completed"
-    };
-  }
+  const savedCertification =
+    await certificationRepository.saveCertification(
+      partnerId,
+      certificationRequest
+    );
 
-  partner.certification = {
-    status: certificationRequest.status,
-    certifiedProducts: certificationRequest.certifiedProducts || [],
-    certificationDate:
-  certificationRequest.certificationDate ||
-  (
-    certificationRequest.status === "CERTIFIED"
-      ? new Date().toISOString()
-      : null
-  ),
-    approver: certificationRequest.approver || "",
-    notes: certificationRequest.notes || "",
-    updatedAt: new Date().toISOString()
-  };
-
-  partner.updatedAt = new Date().toISOString();
-  
   addAuditRecord(
-  partnerId,
-  "CERTIFICATION_UPDATED",
-  certificationRequest
-);
-if (partner.certification.status === "CERTIFIED") {
+    partnerId,
+    "CERTIFICATION_UPDATED",
+    certificationRequest
+  );
+
   await eventPublisher.publishEvent(
     "PARTNER_CERTIFIED",
     {
-      partnerId: partner.partner_id,
-      partnerName: partner.partner_name,
-      certifiedProducts: partner.certification.certifiedProducts,
-      certificationDate: partner.certification.certificationDate
+      partnerId,
+      certifiedProducts:
+        certificationRequest.certifiedProducts
     }
   );
-}
-  return partner;
+
+  return {
+    partnerId,
+    certification: savedCertification
+  };
+
 };
 
-const updateGoLiveStatus = async (partnerId, goLiveRequest) => {
+const updateGoLiveStatus = async (
+  partnerId,
+  goLiveRequest
+) => {
   const partner = await getPartnerById(partnerId);
 
   if (!partner) {
     return null;
   }
 
-  if (
-    goLiveRequest.status === "READY" &&
-    (!partner.certification || partner.certification.status !== "CERTIFIED")
-  ) {
-    return {
-      error: true,
-      statusCode: 400,
-      message: "Certification must be completed before go-live readiness"
-    };
-  }
-
-  partner.goLive = {
-    status: goLiveRequest.status,
-    productionDate:
-  goLiveRequest.productionDate ||
-  (
-    goLiveRequest.status === "READY"
-      ? new Date().toISOString()
-      : null
-  ),
-    businessApproval: goLiveRequest.businessApproval || false,
-    technologyApproval: goLiveRequest.technologyApproval || false,
-    operationsApproval: goLiveRequest.operationsApproval || false,
-    rollbackPlanReady: goLiveRequest.rollbackPlanReady || false,
-    notes: goLiveRequest.notes || "",
-    updatedAt: new Date().toISOString()
-  };
-
-  partner.updatedAt = new Date().toISOString();
+  const savedGoLive =
+    await goLiveRepository.saveGoLive(
+      partnerId,
+      goLiveRequest
+    );
 
   addAuditRecord(
-  partnerId,
-  "GO_LIVE_UPDATED",
-  goLiveRequest
-);
-if (partner.goLive.status === "READY") {
+    partnerId,
+    "GO_LIVE_UPDATED",
+    goLiveRequest
+  );
+
   await eventPublisher.publishEvent(
     "PARTNER_READY_FOR_GO_LIVE",
     {
-      partnerId: partner.partner_id,
-      partnerName: partner.partner_name,
-      productionDate: partner.goLive.productionDate
+      partnerId,
+      productionDate: savedGoLive.production_date
     }
   );
-}
-  return partner;
-};
 
+  return {
+    partnerId,
+    goLive: savedGoLive
+  };
+};
 const getDashboardSummary = () => {
 
   return {
