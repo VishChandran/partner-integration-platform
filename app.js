@@ -7,6 +7,7 @@ const logger = require("./logger/logger");
 const partnerRoutes = require("./routes/partnerRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const eventRoutes = require("./routes/eventRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 
 
@@ -31,6 +32,7 @@ app.use(helmet());
 app.use("/partners", partnerRoutes);
 app.use("/dashboard", dashboardRoutes);
 app.use("/events", eventRoutes);
+app.use("/notifications", notificationRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({
