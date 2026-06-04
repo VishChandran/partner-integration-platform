@@ -6,6 +6,7 @@ const connectivityRepository = require("../repositories/connectivityRepository")
 const testingRepository = require("../repositories/testingRepository");
 const certificationRepository = require("../repositories/certificationRepository");
 const goLiveRepository = require("../repositories/goLiveRepository");
+const partnerLifecycleRepository = require("../repositories/partnerLifecycleRepository");
 
 const createPartner = async (partnerRequest) => {
 
@@ -309,6 +310,11 @@ const getAuditHistory = (
   );
 
 };
+const getPartnerLifecycle = async (partnerId) => {
+  return await partnerLifecycleRepository.getPartnerLifecycle(
+    partnerId
+  );
+};
 
 module.exports = {
   createPartner,
@@ -321,5 +327,6 @@ module.exports = {
   updateCertificationStatus,
   updateGoLiveStatus,
   getDashboardSummary,
-  getAuditHistory
+  getAuditHistory,
+  getPartnerLifecycle
 };

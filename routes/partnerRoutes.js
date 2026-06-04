@@ -127,6 +127,19 @@ router.get("/:partnerId/history", (req, res) => {
 
   res.status(200).json(history);
 });
+router.get("/:partnerId/full", async (req, res) => {
+  const partner = await partnerService.getPartnerLifecycle(
+    req.params.partnerId
+  );
+
+  if (!partner) {
+    return res.status(404).json({
+      message: "Partner not found"
+    });
+  }
+
+  res.status(200).json(partner);
+});
 
 router.get("/:partnerId", async (req, res) => {
   const partner = await partnerService.getPartnerById(
