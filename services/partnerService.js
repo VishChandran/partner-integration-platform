@@ -3,6 +3,7 @@ const auditHistory = require("../store/auditStore");
 const eventPublisher = require("../events/eventPublisher");
 const pool = require("../db/db");
 const connectivityRepository = require("../repositories/connectivityRepository");
+const testingRepository = require("../repositories/testingRepository");
 
 const createPartner = async (partnerRequest) => {
 
@@ -146,42 +147,32 @@ const updateConnectivityStatus = async (partnerId, connectivityRequest) => {
   };
 
 };
-const updateTestingStatus = (partnerId, testingRequest) => {
-  const partner = getPartnerById(partnerId);
+const updateTestingStatus = async (
+  partnerId,
+  testingRequest
+) => {
+  const partner = await getPartnerById(partnerId);
 
   if (!partner) {
     return null;
   }
 
-  if (
-    testingRequest.status === "IN_PROGRESS" &&
-    (!partner.connectivity || partner.connectivity.status !== "COMPLETED")
-  ) {
-    return {
-      error: true,
-      statusCode: 400,
-      message: "Connectivity must be completed before testing can start"
-    };
-  }
+  const savedTesting =
+    await testingRepository.saveTesting(
+      partnerId,
+      testingRequest
+    );
 
-  partner.testing = {
-    status: testingRequest.status,
-    totalTestCases: testingRequest.totalTestCases || 0,
-    passed: testingRequest.passed || 0,
-    failed: testingRequest.failed || 0,
-    blocked: testingRequest.blocked || 0,
-    notes: testingRequest.notes || "",
-    updatedAt: new Date().toISOString()
-  };
-
-  partner.updatedAt = new Date().toISOString();
-  
   addAuditRecord(
-  partnerId,
-  "TESTING_UPDATED",
-  testingRequest
-);
-  return partner;
+    partnerId,
+    "TESTING_UPDATED",
+    testingRequest
+  );
+
+  return {
+    partnerId,
+    testing: savedTesting
+  };
 };
 
 const updateCertificationStatus = async (partnerId, certificationRequest) => {

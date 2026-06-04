@@ -57,8 +57,8 @@ router.patch("/:partnerId/connectivity", async (req, res) => {
   res.status(200).json(partner);
 });
 
-router.patch("/:partnerId/testing", (req, res) => {
-  const partner = partnerService.updateTestingStatus(
+router.patch("/:partnerId/testing", async (req, res) => {
+  const partner = await partnerService.updateTestingStatus(
     req.params.partnerId,
     req.body
   );
