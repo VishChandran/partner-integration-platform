@@ -1,68 +1,102 @@
 const partners = require("../store/partnerStore");
 const auditHistory = require("../store/auditStore");
 const eventPublisher = require("../events/eventPublisher");
+const pool = require("../db/db");
 
-const createPartner = (partnerRequest) => {
-  const existingPartner = getPartnerById(partnerRequest.partnerId);
+const createPartner = async (partnerRequest) => {
+
+  const existingPartner =
+    await getPartnerById(
+      partnerRequest.partnerId
+    );
 
   if (existingPartner) {
 
     return {
-
       error: true,
-
       statusCode: 409,
-
       message: "Partner already exists"
-
     };
 
   }
 
-  const partner = {
+  const query = `
+    INSERT INTO partners
+    (
+      partner_id,
+      partner_name,
+      status,
+      requested_products
+    )
+    VALUES
+    ($1, $2, $3, $4)
+    RETURNING *
+  `;
 
-    partnerId: partnerRequest.partnerId,
+  const values = [
+    partnerRequest.partnerId,
+    partnerRequest.partnerName,
+    "REQUESTED",
+    JSON.stringify(
+      partnerRequest.requestedProducts || []
+    )
+  ];
 
-    partnerName: partnerRequest.partnerName,
+  const result =
+    await pool.query(
+      query,
+      values
+    );
 
-    status: "REQUESTED",
-
-    requestedProducts: partnerRequest.requestedProducts || [],
-
-    createdAt: new Date().toISOString()
-
-  };
-
-  partners.push(partner);
-
-  return partner;
+  return result.rows[0];
 
 };
 
-const getPartners = () => {
-  return partners;
+const getPartners = async () => {
+
+  const result =
+    await pool.query(
+      `
+      SELECT *
+      FROM partners
+      ORDER BY created_at DESC
+      `
+    );
+
+  return result.rows;
+
 };
 
-const getPartnerById = (partnerId) => {
-  return partners.find((partner) => partner.partnerId === partnerId);
+const getPartnerById = async (
+  partnerId
+) => {
+
+  const result =
+    await pool.query(
+      `
+      SELECT *
+      FROM partners
+      WHERE partner_id = $1
+      `,
+      [partnerId]
+    );
+
+  return result.rows[0];
+
 };
+const updatePartnerStatus = async (partnerId, status) => {
+  const result = await pool.query(
+    `
+    UPDATE partners
+    SET status = $1,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE partner_id = $2
+    RETURNING *
+    `,
+    [status, partnerId]
+  );
 
-const updatePartnerStatus = (partnerId, status) => {
-
-  const partner = getPartnerById(partnerId);
-
-  if (!partner) {
-
-    return null;
-
-  }
-
-  partner.status = status;
-
-  partner.updatedAt = new Date().toISOString();
-
-  return partner;
-
+  return result.rows[0];
 };
 
 const getPartnersByStatus = (status) => {

@@ -3,8 +3,8 @@ const partnerService = require("../services/partnerService");
 
 const router = express.Router();
 
-router.post("/", (req, res) => {
-  const partner = partnerService.createPartner(req.body);
+router.post("/", async (req, res) => {
+  const partner = await partnerService.createPartner(req.body);
 
   if (partner.error) {
     return res.status(partner.statusCode).json({
@@ -15,8 +15,8 @@ router.post("/", (req, res) => {
   res.status(201).json(partner);
 });
 
-router.get("/", (req, res) => {
-  const partners = partnerService.getPartners();
+router.get("/", async (req, res) => {
+  const partners = await partnerService.getPartners();
 
   res.status(200).json(partners);
 });
@@ -27,8 +27,8 @@ router.get("/status/:status", (req, res) => {
   res.status(200).json(partners);
 });
 
-router.patch("/:partnerId/status", (req, res) => {
-  const partner = partnerService.updatePartnerStatus(
+router.patch("/:partnerId/status", async (req, res) => {
+  const partner = await partnerService.updatePartnerStatus(
     req.params.partnerId,
     req.body.status
   );
@@ -56,6 +56,7 @@ router.patch("/:partnerId/connectivity", (req, res) => {
 
   res.status(200).json(partner);
 });
+
 router.patch("/:partnerId/testing", (req, res) => {
   const partner = partnerService.updateTestingStatus(
     req.params.partnerId,
@@ -76,6 +77,7 @@ router.patch("/:partnerId/testing", (req, res) => {
 
   res.status(200).json(partner);
 });
+
 router.patch("/:partnerId/certification", (req, res) => {
   const partner = partnerService.updateCertificationStatus(
     req.params.partnerId,
@@ -117,19 +119,19 @@ router.patch("/:partnerId/go-live", (req, res) => {
 
   res.status(200).json(partner);
 });
-router.get("/:partnerId/history", (req, res) => {
 
-  const history =
-    partnerService.getAuditHistory(
-      req.params.partnerId
-    );
+router.get("/:partnerId/history", (req, res) => {
+  const history = partnerService.getAuditHistory(
+    req.params.partnerId
+  );
 
   res.status(200).json(history);
-
 });
 
-router.get("/:partnerId", (req, res) => {
-  const partner = partnerService.getPartnerById(req.params.partnerId);
+router.get("/:partnerId", async (req, res) => {
+  const partner = await partnerService.getPartnerById(
+    req.params.partnerId
+  );
 
   if (!partner) {
     return res.status(404).json({
