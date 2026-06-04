@@ -2,6 +2,7 @@ const partners = require("../store/partnerStore");
 const auditHistory = require("../store/auditStore");
 const eventPublisher = require("../events/eventPublisher");
 const pool = require("../db/db");
+const connectivityRepository = require("../repositories/connectivityRepository");
 
 const createPartner = async (partnerRequest) => {
 
@@ -109,30 +110,41 @@ const getPartnersByStatus = (status) => {
 
 };
 
-const updateConnectivityStatus = (partnerId, connectivityRequest) => {
-  const partner = getPartnerById(partnerId);
+const updateConnectivityStatus = async (partnerId, connectivityRequest) => {
+  const partner = await getPartnerById(partnerId);
 
   if (!partner) {
     return null;
   }
 
-  partner.connectivity = {
-    status: connectivityRequest.status,
-    sandboxAccess: connectivityRequest.sandboxAccess || false,
-    ipWhitelisted: connectivityRequest.ipWhitelisted || false,
-    certificateExchanged: connectivityRequest.certificateExchanged || false,
-    apiGatewayAccess: connectivityRequest.apiGatewayAccess || false,
-    notes: connectivityRequest.notes || "",
-    updatedAt: new Date().toISOString()
+  const savedConnectivity =
+
+    await connectivityRepository.saveConnectivity(
+
+      partnerId,
+
+      connectivityRequest
+
+    );
+
+  addAuditRecord(
+
+    partnerId,
+
+    "CONNECTIVITY_UPDATED",
+
+    connectivityRequest
+
+  );
+
+  return {
+
+    partnerId,
+
+    connectivity: savedConnectivity
+
   };
 
-  partner.updatedAt = new Date().toISOString();
-  addAuditRecord(
-  partnerId,
-  "CONNECTIVITY_UPDATED",
-  connectivityRequest
-);
-  return partner;
 };
 const updateTestingStatus = (partnerId, testingRequest) => {
   const partner = getPartnerById(partnerId);
