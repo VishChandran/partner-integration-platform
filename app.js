@@ -6,10 +6,11 @@ const config = require("./config/config");
 const logger = require("./logger/logger");
 const partnerRoutes = require("./routes/partnerRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const eventRoutes = require("./routes/eventRoutes");
+
 
 
 const app = express();
-app.use("/dashboard", dashboardRoutes);
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +27,10 @@ app.use(helmet());
 | Routes
 |--------------------------------------------------------------------------
 */
+
+app.use("/partners", partnerRoutes);
+app.use("/dashboard", dashboardRoutes);
+app.use("/events", eventRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -47,7 +52,6 @@ app.get("/health", (req, res) => {
 | Server Startup
 |--------------------------------------------------------------------------
 */
-app.use("/partners", partnerRoutes);
 app.listen(config.port, () => {
   logger.info(
     {

@@ -1,5 +1,6 @@
 const partners = require("../store/partnerStore");
 const auditHistory = require("../store/auditStore");
+const eventPublisher = require("../events/eventPublisher");
 
 const createPartner = (partnerRequest) => {
   const existingPartner = getPartnerById(partnerRequest.partnerId);
@@ -177,7 +178,17 @@ const updateCertificationStatus = (partnerId, certificationRequest) => {
   "CERTIFICATION_UPDATED",
   certificationRequest
 );
-
+if (partner.certification.status === "CERTIFIED") {
+  eventPublisher.publishEvent(
+    "PARTNER_CERTIFIED",
+    {
+      partnerId: partner.partnerId,
+      partnerName: partner.partnerName,
+      certifiedProducts: partner.certification.certifiedProducts,
+      certificationDate: partner.certification.certificationDate
+    }
+  );
+}
   return partner;
 };
 
@@ -223,7 +234,16 @@ const updateGoLiveStatus = (partnerId, goLiveRequest) => {
   "GO_LIVE_UPDATED",
   goLiveRequest
 );
-
+if (partner.goLive.status === "READY") {
+  eventPublisher.publishEvent(
+    "PARTNER_READY_FOR_GO_LIVE",
+    {
+      partnerId: partner.partnerId,
+      partnerName: partner.partnerName,
+      productionDate: partner.goLive.productionDate
+    }
+  );
+}
   return partner;
 };
 
