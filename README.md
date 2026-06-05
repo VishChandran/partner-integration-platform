@@ -1,14 +1,14 @@
 # Partner Integration Platform
 
-A backend application that simulates onboarding external partners through connectivity setup, testing, certification, and production readiness.
+A backend application that simulates onboarding external partners to an API platform through connectivity setup, testing, certification, and production readiness.
 
 The project follows a partner through each stage of the onboarding lifecycle and publishes events as key milestones are completed.
 
-I built this project to better understand onboarding workflows, lifecycle management, and event-driven integration patterns commonly used across enterprise platforms.
+I built this project to better understand how partner API onboarding programs are managed, how certification workflows are tracked, and how event-driven patterns can be used to decouple downstream processes such as notifications and reporting.
 
 ## Features
 
-- Partner registration
+- Partner API onboarding
 - Connectivity tracking
 - Testing management
 - Certification management
