@@ -3,8 +3,8 @@ const eventPublisher = require("../events/eventPublisher");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  const events = eventPublisher.getEvents();
+router.get("/", async(req, res) => {
+  const events = await eventPublisher.getEvents();
 
   res.status(200).json(events);
 });

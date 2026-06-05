@@ -1,15 +1,18 @@
 const events = require("../store/eventStore");
 const kafkaProducer = require("../kafka/kafkaProducer");
+const eventRepository = require("../repositories/eventRepository");
 
 const publishEvent = async (eventType, payload) => {
-  const event = {
-    eventId: `EVT-${Date.now()}`,
-    eventType,
-    payload,
-    publishedAt: new Date().toISOString()
-  };
+ const event = {
+  eventId: `EVT-${Date.now()}`,
+  correlationId: payload.correlationId || `CORR-${Date.now()}`,
+  eventType,
+  payload,
+  publishedAt: new Date().toISOString()
+};
 
   events.push(event);
+  await eventRepository.saveEvent(event);
 
   try {
     await kafkaProducer.publishKafkaEvent(
@@ -26,8 +29,8 @@ const publishEvent = async (eventType, payload) => {
   return event;
 };
 
-const getEvents = () => {
-  return events;
+const getEvents = async() => {
+  return await eventRepository.getEvents();
 };
 
 module.exports = {

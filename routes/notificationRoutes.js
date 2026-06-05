@@ -3,8 +3,8 @@ const notificationService = require("../services/notificationService");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  const notifications = notificationService.getNotifications();
+router.get("/", async(req, res) => {
+  const notifications = await notificationService.getNotifications();
 
   res.status(200).json(notifications);
 });

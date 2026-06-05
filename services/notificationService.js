@@ -1,6 +1,7 @@
 const notifications = require("../store/notificationStore");
+const notificationRepository = require("../repositories/notificationRepository");
 
-const createNotification = (
+const createNotification = async(
   notificationType,
   recipient,
   message,
@@ -17,12 +18,14 @@ const createNotification = (
   };
 
   notifications.push(notification);
+  await notificationRepository.saveNotification(notification);
 
   return notification;
 };
 
-const getNotifications = () => {
-  return notifications;
+const getNotifications = async() => {
+  return await notificationRepository.getNotifications();
+
 };
 
 module.exports = {
