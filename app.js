@@ -55,16 +55,31 @@ app.get("/health", (req, res) => {
 | Server Startup
 |--------------------------------------------------------------------------
 */
+
 app.listen(config.port, () => {
+
   logger.info(
+
     {
+
       port: config.port
+
     },
+
     `${config.appName} started successfully`
+
   );
-  });
-  /*
-  kafkaConsumer.startConsumer()
-  .catch(console.error);
-  });
-  */
+
+  console.log("Starting Kafka consumer...");
+
+  kafkaConsumer
+
+    .startConsumer()
+
+    .catch(console.error);
+
+});
+  
+  
+
+  
