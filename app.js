@@ -8,6 +8,7 @@ const partnerRoutes = require("./routes/partnerRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const kafkaConsumer = require("./kafka/kafkaConsumer");
 
 
 
@@ -61,4 +62,9 @@ app.listen(config.port, () => {
     },
     `${config.appName} started successfully`
   );
-});
+  });
+  /*
+  kafkaConsumer.startConsumer()
+  .catch(console.error);
+  });
+  */
