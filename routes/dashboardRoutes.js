@@ -4,10 +4,10 @@ const router = express.Router();
 
 const partnerService = require("../services/partnerService");
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
 
   const summary =
-    partnerService.getDashboardSummary();
+    await partnerService.getDashboardSummary();
 
   res.status(200).json(summary);
 

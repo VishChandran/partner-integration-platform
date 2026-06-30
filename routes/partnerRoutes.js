@@ -21,8 +21,8 @@ router.get("/", async (req, res) => {
   res.status(200).json(partners);
 });
 
-router.get("/status/:status", (req, res) => {
-  const partners = partnerService.getPartnersByStatus(req.params.status);
+router.get("/status/:status", async (req, res) => {
+  const partners = await partnerService.getPartnersByStatus(req.params.status);
 
   res.status(200).json(partners);
 });

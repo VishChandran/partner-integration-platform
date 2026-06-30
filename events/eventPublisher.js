@@ -1,11 +1,12 @@
 const events = require("../store/eventStore");
+const crypto = require("crypto");
 const kafkaProducer = require("../kafka/kafkaProducer");
 const eventRepository = require("../repositories/eventRepository");
 
 const publishEvent = async (eventType, payload) => {
  const event = {
-  eventId: `EVT-${Date.now()}`,
-  correlationId: payload.correlationId || `CORR-${Date.now()}`,
+  eventId: `EVT-${crypto.randomUUID()}`,
+  correlationId: payload.correlationId || `CORR-${crypto.randomUUID()}`,
   eventType,
   payload,
   publishedAt: new Date().toISOString()

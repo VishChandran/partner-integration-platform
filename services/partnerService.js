@@ -1,4 +1,3 @@
-const partners = require("../store/partnerStore");
 const auditHistory = require("../store/auditStore");
 const eventPublisher = require("../events/eventPublisher");
 const pool = require("../db/db");
@@ -104,13 +103,19 @@ const updatePartnerStatus = async (partnerId, status) => {
   return result.rows[0];
 };
 
-const getPartnersByStatus = (status) => {
+const getPartnersByStatus = async (status) => {
 
-  return partners.filter(
-
-    partner => partner.status === status
-
+  const result = await pool.query(
+    `
+    SELECT *
+    FROM partners
+    WHERE status = $1
+    ORDER BY created_at DESC
+    `,
+    [status]
   );
+
+  return result.rows;
 
 };
 
@@ -253,33 +258,49 @@ const updateGoLiveStatus = async (
     goLive: savedGoLive
   };
 };
-const getDashboardSummary = () => {
+const getDashboardSummary = async () => {
+
+  const result = await pool.query(
+    `
+    SELECT
+      COUNT(*)::int AS total_partners,
+      COUNT(*) FILTER (WHERE p.status = 'REQUESTED')::int AS requested,
+      COUNT(*) FILTER (WHERE p.status = 'APPROVED')::int AS approved,
+      COUNT(*) FILTER (
+        WHERE cert.status = 'CERTIFIED'
+      )::int AS certified,
+      COUNT(*) FILTER (
+        WHERE gl.status = 'READY'
+      )::int AS production_ready
+    FROM partners p
+    LEFT JOIN LATERAL (
+      SELECT status
+      FROM partner_certification
+      WHERE partner_id = p.partner_id
+      ORDER BY updated_at DESC, id DESC
+      LIMIT 1
+    ) cert ON true
+    LEFT JOIN LATERAL (
+      SELECT status
+      FROM partner_go_live
+      WHERE partner_id = p.partner_id
+      ORDER BY updated_at DESC, id DESC
+      LIMIT 1
+    ) gl ON true
+    `
+  );
+
+  const summary = result.rows[0];
 
   return {
-
-    totalPartners: partners.length,
-
-    requested: partners.filter(
-      partner => partner.status === "REQUESTED"
-    ).length,
-
-    approved: partners.filter(
-      partner => partner.status === "APPROVED"
-    ).length,
-
-    certified: partners.filter(
-      partner =>
-        partner.certification &&
-        partner.certification.status === "CERTIFIED"
-    ).length,
-
-    productionReady: partners.filter(
-      partner =>
-        partner.goLive &&
-        partner.goLive.status === "READY"
-    ).length
-    };
+    totalPartners: summary.total_partners,
+    requested: summary.requested,
+    approved: summary.approved,
+    certified: summary.certified,
+    productionReady: summary.production_ready
   };
+
+};
 
   const addAuditRecord = (
   partnerId,

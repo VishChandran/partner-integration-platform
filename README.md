@@ -71,6 +71,8 @@ Create tables:
 ```bash
 psql -d partner_integration -f db/schema.sql
 
+psql -d partner_integration -f db/lifecycle-schema.sql
+
 psql -d partner_integration -f db/event-notification-schema.sql
 ```
 
@@ -143,3 +145,9 @@ Partner Created
 → Go-Live Ready
 
 Lifecycle events are published to Kafka and consumed by downstream services that generate notifications and maintain operational records.
+
+## Known Design Gaps
+
+- Kafka outbox and retry: lifecycle updates currently persist state and attempt to publish Kafka events inline. A production design should use a durable outbox table with retry workers so events can be recovered after broker or network failures.
+- Dead-letter queue: consumer failures currently rely on Kafka retry behavior only. A production design should route poison messages to a DLQ with enough metadata for investigation and replay.
+- Lifecycle history versus current state: lifecycle stage tables currently append records. The platform should explicitly decide whether these tables are immutable history, current state, or a split model with both history and one authoritative current record per partner and stage.

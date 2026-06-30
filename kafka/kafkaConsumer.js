@@ -42,7 +42,7 @@ const startConsumer = async () => {
         "Kafka Event Received:",
         event.eventType
       );
-notificationHandler
+      await notificationHandler
 
         .processEvent(event);
     }

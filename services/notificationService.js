@@ -1,4 +1,5 @@
 const notifications = require("../store/notificationStore");
+const crypto = require("crypto");
 const notificationRepository = require("../repositories/notificationRepository");
 
 const createNotification = async(
@@ -8,7 +9,7 @@ const createNotification = async(
   sourceEvent
 ) => {
   const notification = {
-    notificationId: `NTF-${Date.now()}`,
+    notificationId: `NTF-${crypto.randomUUID()}`,
     notificationType,
     recipient,
     message,

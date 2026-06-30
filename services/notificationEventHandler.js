@@ -1,13 +1,13 @@
 const notificationService =
   require("./notificationService");
 
-const processEvent = (event) => {
+const processEvent = async (event) => {
 
   if (
     event.eventType ===
     "PARTNER_CERTIFIED"
   ) {
-    notificationService.createNotification(
+    await notificationService.createNotification(
       "EMAIL",
       "partner-operations@bank.com",
       `Partner ${event.payload.partnerId} certified`,
@@ -19,7 +19,7 @@ const processEvent = (event) => {
     event.eventType ===
     "PARTNER_READY_FOR_GO_LIVE"
   ) {
-    notificationService.createNotification(
+    await notificationService.createNotification(
       "EMAIL",
       "production-readiness@bank.com",
       `Partner ${event.payload.partnerId} ready for go-live`,
