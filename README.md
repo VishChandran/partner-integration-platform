@@ -25,15 +25,51 @@ I built this project to better understand how partner API onboarding programs ar
 
 ## Architecture
 
-Partner API
+```text
+Client / Partner Ops
+        |
+        v
+Express Partner API
+        |
+        +--> Request validation
+        |
+        +--> PostgreSQL
+        |       |
+        |       +--> partners
+        |       +--> current lifecycle tables
+        |       +--> partner_lifecycle_history
+        |
+        +--> Partner event created
+                |
+                v
+        PostgreSQL event_outbox
+                |
+                v
+        Kafka topic: partner-lifecycle-events
+                |
+                v
+        Kafka consumer
+                |
+                +--> Notification service
+                |       |
+                |       v
+                |   partner_notifications
+                |
+                +--> event_dead_letters
+                    for failed consumer processing
 
-→ PostgreSQL
+Outbox retry flow:
 
-→ Kafka Events
-
-→ Kafka Consumer
-
-→ Notifications
+event_outbox pending/failed events
+        |
+        v
+POST /events/outbox/retry
+        |
+        +--> republish to Kafka
+        |
+        +--> event_dead_letters
+             after retry exhaustion
+```
 
 ## Technology Stack
 
