@@ -50,6 +50,20 @@ app.get("/health", (req, res) => {
   });
 });
 
+app.use((err, req, res, next) => {
+  logger.error(
+    {
+      err,
+      path: req.path
+    },
+    "Unhandled request error"
+  );
+
+  res.status(500).json({
+    message: "Internal server error"
+  });
+});
+
 /*
 |--------------------------------------------------------------------------
 | Server Startup

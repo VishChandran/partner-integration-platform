@@ -1,6 +1,7 @@
 const { Kafka } = require("kafkajs");
 const config = require("../config/config");
 const notificationHandler = require( "../services/notificationEventHandler");
+const deadLetterRepository = require("../repositories/deadLetterRepository");
 
 const kafka = new Kafka({
   clientId: config.kafka.clientId,
@@ -42,9 +43,20 @@ const startConsumer = async () => {
         "Kafka Event Received:",
         event.eventType
       );
-      await notificationHandler
+      try {
+        await notificationHandler
 
-        .processEvent(event);
+          .processEvent(event);
+      } catch (error) {
+        await deadLetterRepository.saveDeadLetter({
+          eventId: event.eventId,
+          source: "CONSUMER",
+          topic: "partner-lifecycle-events",
+          eventType: event.eventType,
+          payload: event,
+          error
+        });
+      }
     }
   });
 

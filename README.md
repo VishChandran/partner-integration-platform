@@ -18,6 +18,10 @@ I built this project to better understand how partner API onboarding programs ar
 - PostgreSQL persistence
 - Kafka event publishing and consumption
 - Notification processing
+- Request validation
+- Durable event outbox with retry endpoint
+- Dead-letter queue for failed event delivery/consumption
+- Current-state lifecycle tables with append-only lifecycle history
 
 ## Architecture
 
@@ -132,6 +136,24 @@ Notifications
 GET /notifications
 ```
 
+Event Outbox
+
+```http
+GET /events/outbox
+```
+
+Retry Pending Outbox Events
+
+```http
+POST /events/outbox/retry
+```
+
+Dead Letters
+
+```http
+GET /events/dead-letters
+```
+
 ## Example Flow
 
 Partner Created
@@ -144,10 +166,20 @@ Partner Created
 
 → Go-Live Ready
 
-Lifecycle events are published to Kafka and consumed by downstream services that generate notifications and maintain operational records.
+Lifecycle events are written to a durable outbox, published to Kafka, consumed by downstream services, and converted into notifications. Failed publishes stay visible in the outbox for retry, while exhausted publish attempts or consumer processing failures are captured in a dead-letter table for investigation.
 
-## Known Design Gaps
+## Reliability Model
 
-- Kafka outbox and retry: lifecycle updates currently persist state and attempt to publish Kafka events inline. A production design should use a durable outbox table with retry workers so events can be recovered after broker or network failures.
-- Dead-letter queue: consumer failures currently rely on Kafka retry behavior only. A production design should route poison messages to a DLQ with enough metadata for investigation and replay.
-- Lifecycle history versus current state: lifecycle stage tables currently append records. The platform should explicitly decide whether these tables are immutable history, current state, or a split model with both history and one authoritative current record per partner and stage.
+- Partner lifecycle stage tables represent current state by partner and stage.
+- Every lifecycle update is also recorded in `partner_lifecycle_history`.
+- Events are persisted to `partner_events` and `event_outbox` before Kafka publish is attempted.
+- `POST /events/outbox/retry` replays pending or failed outbox events.
+- Events that exceed retry limits, or fail during consumer processing, are recorded in `event_dead_letters`.
+
+## Tests
+
+Run the unit tests:
+
+```bash
+npm test
+```

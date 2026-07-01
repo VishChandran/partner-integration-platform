@@ -1,9 +1,19 @@
 const express = require("express");
 const partnerService = require("../services/partnerService");
+const validators = require("../validators/partnerValidators");
 
 const router = express.Router();
 
 router.post("/", async (req, res) => {
+  if (
+    validators.rejectInvalid(
+      res,
+      validators.validatePartnerRequest(req.body)
+    )
+  ) {
+    return;
+  }
+
   const partner = await partnerService.createPartner(req.body);
 
   if (partner.error) {
@@ -28,6 +38,15 @@ router.get("/status/:status", async (req, res) => {
 });
 
 router.patch("/:partnerId/status", async (req, res) => {
+  if (
+    validators.rejectInvalid(
+      res,
+      validators.validatePartnerStatusRequest(req.body)
+    )
+  ) {
+    return;
+  }
+
   const partner = await partnerService.updatePartnerStatus(
     req.params.partnerId,
     req.body.status
@@ -43,6 +62,15 @@ router.patch("/:partnerId/status", async (req, res) => {
 });
 
 router.patch("/:partnerId/connectivity", async (req, res) => {
+  if (
+    validators.rejectInvalid(
+      res,
+      validators.validateConnectivityRequest(req.body)
+    )
+  ) {
+    return;
+  }
+
   const partner = await partnerService.updateConnectivityStatus(
     req.params.partnerId,
     req.body
@@ -58,6 +86,15 @@ router.patch("/:partnerId/connectivity", async (req, res) => {
 });
 
 router.patch("/:partnerId/testing", async (req, res) => {
+  if (
+    validators.rejectInvalid(
+      res,
+      validators.validateTestingRequest(req.body)
+    )
+  ) {
+    return;
+  }
+
   const partner = await partnerService.updateTestingStatus(
     req.params.partnerId,
     req.body
@@ -79,6 +116,15 @@ router.patch("/:partnerId/testing", async (req, res) => {
 });
 
 router.patch("/:partnerId/certification", async (req, res) => {
+  if (
+    validators.rejectInvalid(
+      res,
+      validators.validateCertificationRequest(req.body)
+    )
+  ) {
+    return;
+  }
+
   const partner = await partnerService.updateCertificationStatus(
     req.params.partnerId,
     req.body
@@ -100,6 +146,15 @@ router.patch("/:partnerId/certification", async (req, res) => {
 });
 
 router.patch("/:partnerId/go-live", async (req, res) => {
+  if (
+    validators.rejectInvalid(
+      res,
+      validators.validateGoLiveRequest(req.body)
+    )
+  ) {
+    return;
+  }
+
   const partner = await partnerService.updateGoLiveStatus(
     req.params.partnerId,
     req.body

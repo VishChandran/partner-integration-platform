@@ -50,13 +50,6 @@ const getPartnerLifecycle = async (partnerId) => {
 
     WHERE p.partner_id = $1
 
-    ORDER BY
-      c.updated_at DESC,
-      t.updated_at DESC,
-      cert.updated_at DESC,
-      gl.updated_at DESC
-
-    LIMIT 1
     `,
     [partnerId]
   );
